@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>AgroCV App</title>
+    </head>
+    <body>
+        <h2>Обработка...</h2>
+        Страница автоматически переадресует вас, когда изображения будут готовы.
+         
+
+        <script>
+            // Посылает GET запрос чтобы узнать четам по обработке
+            async function isProcessed(id) {
+                const response = await fetch(`/isprocessed/${id}`, {
+                    method: "GET",
+                    headers: {"Accept": "application/json"}
+                })
+                if (response.ok === true) {
+                    const res = await response.json();
+                    if(res.message == "failed") {
+                        window.location = "/failed_processing"
+                    }
+                    else if(res.message == "ready") {
+                        window.location = `/results/${id}`
+                    }
+                }
+                
+            }
+
+            // Получаем uuid из адресной строки и каждую секунду спрашиваем
+            // сервак как там запрос на обработку наш готов или как м?
+            const currentUrl = window.location.href;
+            const uuid = currentUrl.split("/").slice(-1);
+            setInterval(() => isProcessed(uuid[0]), 1000)
+        </script>
+    </body>
+</html>
