@@ -148,3 +148,7 @@ async def failed_processing_page():
 @app.get("/fail_gif")
 async def fail_gif():
     return FileResponse(f"public/gifs/Ideya_kharosh_realizatsia_pizdets.gif")
+
+@app.get("/res/{resource}")
+async def get_resource(resource):
+    return FileResponse(f"public/{resource}")
