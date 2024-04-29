@@ -11,14 +11,6 @@ def show_img(img):
     cv2.imshow("Binary", img)
     cv2.waitKey(0)
 
-
-def loading_displaying_saving():
-    img = cv2.imread(r'C:\Users\koval\OneDrive\Рабочий стол\Sunflowers\code\jj.jpg',
-                     cv2.IMREAD_GRAYSCALE)  # загрузка изображения
-    show_img(img)
-    cv2.imwrite('gray_jj.jpg', img)
-
-
 def resizing(img):
     res_img = cv2.resize(
         img, (img.shape[0]*3, img.shape[1]*2), cv2.INTER_LINEAR)
@@ -137,13 +129,6 @@ def del_flowers(img):
             else:
                 last = -1
         
-            
-
-def create_img():
-    width = 400 
-    height = 500
-    blank_image = np.zeros((height, width), np.uint8)
-
 def prog(img):
     global T_IMG 
     T_IMG = img
