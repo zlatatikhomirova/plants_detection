@@ -57,7 +57,12 @@ async def process_files(uuid: str) -> None:
     outputs: list[int] = []
     files_counter = 0
     for file in req.imgs:
-        img = Image.open(io.BytesIO(file))
+        img = Image.Image()
+        try:
+            img = Image.open(io.BytesIO(file))
+        except Exception:
+            req.failed = True
+            return
         output = MNISTModel.eval_mnist_on_file(img)
         outputs.append(output)
 
@@ -147,7 +152,7 @@ async def failed_processing_page():
 
 @app.get("/fail_gif")
 async def fail_gif():
-    return FileResponse(f"public/gifs/Ideya_kharosh_realizatsia_pizdets.gif")
+    return FileResponse(f"public/gifs/marg_fail.gif")
 
 @app.get("/res/{resource}")
 async def get_resource(resource):

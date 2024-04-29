@@ -68,6 +68,12 @@
     padding: 2rem 1.5rem;
     font: 1rem/1.5 "PT Sans", Arial, sans-serif;
     color: #5a5a5a;
+    animation: fadein ease 0.5s;
+  }
+
+  @keyframes fadein {
+    0%  {opacity: 0; padding: 4rem 1.5rem;}
+    100%    {opacity: 1; padding: 2rem 1.5rem;}
   }
   
   /* Override for form controls */
