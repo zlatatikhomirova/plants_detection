@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>AgroCV App</title>
+        <link rel="stylesheet" href="/res/styles.css"/>
+        <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic|PT+Mono&subset=latin,cyrillic"/>
+    </head>
+    <body>
+        <div class="container">
+            <h2>Результаты:</h2>
+            <table>
+                <tbody>
+
+                </tbody>
+            </table>
+
+            <a href="/">На главную</a>
+         </div>
+
+        <script>
+            async function getResults(id) {
+                // Этот GET запрос вернет пути к изображениям и оценку модели для каждого
+                // из изображения для запроса 'id'.
+                const response = await fetch(`/getresults/${id}`, {
+                    method: "GET",
+                    headers: {"Accept": "application/json"}
+                })
+                // если запрос ОКЭЙ то для каждого изображения добавляем строку в таблицу(generateRow(r))
+                if (response.ok === true) {
+                    const req = await response.json();
+                    const rows = document.querySelector("tbody");
+                    req.forEach(r => rows.append(generateRow(r)));
+                }
+                else {
+                    console.log("response not ok");
+                }
+            }
+
+            function generateRow(r) {
+                // добавляем табличную строку
+                const tr = document.createElement("tr");
+                
+                // пихаем в строку картинку и цифорку которую определила модель
+                const r_img = document.createElement("td");
+                let img = document.createElement("img");
+                img.src = r.data;
+                r_img.append(img);
+
+                const r_name = document.createElement("td");
+                r_name.append(r.label);
+                tr.append(r_img);
+                tr.append(r_name);
+
+                return tr;
+            }
+
+            // При старте страницы определяем uuid из адресной строки
+            // и сразу просим сервер результаты этого запроса
+            const currentUrl = window.location.href;
+            const uuid = currentUrl.split("/").slice(-1);
+            //console.log(uuid[0])
+            getResults(uuid[0]);
+        </script>
+    </body>
+</html>
