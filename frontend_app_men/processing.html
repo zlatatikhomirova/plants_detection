@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Подключаем фреймворк bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <title>AgroCV app</title>
+  </head>
+  <body>
+    <!-- В контейнере с помощью колонок разеделяю место для логотипа и описания -->
+    <div class="container-lg">
+      <div class="row">
+        <div class="col-lg-3 mx-auto">
+          <img class="rounded-img" src="sunflower2.0.png" alt="AgroCV_Logo" />
+        </div>
+        <div class="col-lg-9 text-center">
+          <h1 class="fw-light"><b>AgroCV</b></h1>
+          <p class="lead text-muted">описание</p>
+        </div>
+      </div>
+    </div>
+    <br />
+    <!-- Выделяю стадию работы -->
+    <div class="container-lg text-center">
+      <p>
+        Загрузка -> <b><u>Обработка</u></b> -> Результат
+      </p>
+    </div>
+    <br />
+    <!-- Прогресс бар -->
+    <div class="loader mx-auto"></div>
+    <br />
+    <div class="container-lg text-center">
+      <p>Прогресс бар будет когда-нибудь, не факт, потом</p>
+      <p>А пока 1000/7</p>
+    </div>
+  </body>
+  <script src="script.js"></script>
+</html>
