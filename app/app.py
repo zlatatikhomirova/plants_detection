@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 from PIL import Image
 import io
 import asyncio
+import random
 
 import mnist_model.mnist_model_eval as MNISTModel
 
@@ -28,6 +29,10 @@ class ProcessingRequest:
 
         self.ready = False
         self.failed = False
+
+        self.processed_files = 0
+        self.total_files_to_process = len(imgs)
+
         self.results: list[int] = []
 
         self.pngs_paths: list[str] = []
@@ -71,8 +76,11 @@ async def process_files(uuid: str) -> None:
         req.pngs_paths.append(f'/getnumberpng/{uuid}_{files_counter}.png')
         files_counter += 1
         img.close()
+
+        req.processed_files += 1
+        await asyncio.sleep(random.random() * 1.25 + 0.25) # some useful work :)
     
-    await asyncio.sleep(2) # some useful work :)
+    #await asyncio.sleep(2) # some useful work :)
         
     req.results = outputs
     req.ready = True
@@ -93,7 +101,7 @@ async def results_page(uuid):
     if req is None:
         return RedirectResponse("/", status_code=status.HTTP_404_NOT_FOUND)
     
-    return FileResponse("public/results.html")
+    return FileResponse("public/result.html")
 
 @app.get("/getresults/{uuid}")
 async def on_get_results(uuid: str):
@@ -123,7 +131,7 @@ async def is_processed(uuid: str):
     if req is None or req.failed == True:
         return JSONResponse({"message":"failed"})
     if req.ready == False:
-        return JSONResponse({"message":"not ready"})
+        return JSONResponse({"message":"not ready", "processed_files": req.processed_files, "total_files": req.total_files_to_process})
     return JSONResponse({"message":"ready"})
 
 @app.post("/uploadfiles/")
@@ -133,6 +141,8 @@ async def on_upload_files(files: Annotated[list[bytes], File()]):
     и отправляем асинхронную задачу на обработку этого запроса. Асинхронная задача т.к. 
     запрос может долго обрабатываться и мы не хотим тупо вешать клиенту браузер и наш сервер.
     """
+    print(len(files))
+    if len(files) == 0: return
     req = ProcessingRequest(files)
     requests.append(req)
     asyncio.create_task(process_files(req.id))
@@ -152,7 +162,7 @@ async def failed_processing_page():
 
 @app.get("/fail_gif")
 async def fail_gif():
-    return FileResponse(f"public/gifs/marg_fail.gif")
+    return FileResponse(f"public/gifs/ozon.gif")
 
 @app.get("/res/{resource}")
 async def get_resource(resource):
