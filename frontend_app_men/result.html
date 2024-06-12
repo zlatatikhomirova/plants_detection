@@ -10,7 +10,7 @@
       integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
       crossorigin="anonymous"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="/res/styles.css" />
     <title>AgroCV app</title>
   </head>
   <body>
@@ -23,7 +23,11 @@
           </div>
           <div class="col-lg-9 text-center">
             <h1 class="fw-light"><b>AgroCV</b></h1>
-            <p class="lead text-muted">описание</p>
+            <p class="lead text-muted">
+              Приложение “AgroCV” позволяет с помощью нейронной сети создавать
+              карту растительности поля, что, в свою очередь, даёт возможность
+              распознавать отдельные подсолнечники и их локализацию.
+            </p>
           </div>
         </div>
       </div>
@@ -46,7 +50,7 @@
       </div>
     </div>
   </body>
-  <script src="script.js"></script>
+  <script src="/res/script.js"></script>
   <script>
     const currentUrl = window.location.href;
     const uuid = currentUrl.split("/").slice(-1);
