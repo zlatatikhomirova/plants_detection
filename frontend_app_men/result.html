@@ -14,35 +14,45 @@
     <title>AgroCV app</title>
   </head>
   <body>
-    <!-- В контейнере с помощью колонок разеделяю место для логотипа и описания -->
-    <div class="container-lg">
-      <div class="row">
-        <div class="col-lg-3 mx-auto">
-          <img class="rounded-img" src="sunflower2.0.png" alt="AgroCV_Logo" />
-        </div>
-        <div class="col-lg-9 text-center">
-          <h1 class="fw-light"><b>AgroCV</b></h1>
-          <p class="lead text-muted">описание</p>
+    <div class="hero">
+      <!-- В контейнере с помощью колонок разеделяю место для логотипа и описания -->
+      <div class="container-lg">
+        <div class="row">
+          <div class="col-lg-3 mx-auto">
+            <img class="rounded-img" src="sunflower3.0.png" alt="AgroCV_Logo" />
+          </div>
+          <div class="col-lg-9 text-center">
+            <h1 class="fw-light"><b>AgroCV</b></h1>
+            <p class="lead text-muted">описание</p>
+          </div>
         </div>
       </div>
-    </div>
-    <br />
-    <!-- Выделяю стадию работы -->
-    <div class="container-lg text-center">
-      <p>
-        Загрузка -> Обработка -> <b><u>Результат</u></b>
-      </p>
-    </div>
-    <br />
-    <!-- Вывод результатов -->
-    <div class="container">
-      <h2>Результаты:</h2>
-      <table>
-        <tbody></tbody>
-      </table>
+      <br />
+      <!-- Выделяю стадию работы -->
+      <div class="container-lg text-center" id="global-progress">
+        <p></p>
+        <p>Запрос 🡒 Обработка 🡒 <span>Результат</span></p>
+      </div>
+      <br />
+      <!-- Вывод результатов -->
+      <div class="container-lg text-center">
+        <h2>Результаты:</h2>
+        <a id="download_a" href="/">Скачать архивом</a>
+        <table>
+          <tbody></tbody>
+        </table>
 
-      <a href="/">На главную</a>
+        <a href="/">На главную</a>
+      </div>
     </div>
   </body>
   <script src="script.js"></script>
+  <script>
+    const currentUrl = window.location.href;
+    const uuid = currentUrl.split("/").slice(-1);
+    getResults(uuid[0]);
+
+    const download_a = document.getElementById("download_a");
+    download_a.href = "/download_archive/" + uuid;
+  </script>
 </html>

@@ -14,33 +14,37 @@
     <title>AgroCV app</title>
   </head>
   <body>
-    <!-- В контейнере с помощью колонок разеделяю место для логотипа и описания -->
-    <div class="container-lg">
-      <div class="row">
-        <div class="col-lg-3 mx-auto">
-          <img class="rounded-img" src="sunflower2.0.png" alt="AgroCV_Logo" />
-        </div>
-        <div class="col-lg-9 text-center">
-          <h1 class="fw-light"><b>AgroCV</b></h1>
-          <p class="lead text-muted">описание</p>
+    <div class="hero">
+      <!-- В контейнере с помощью колонок разеделяю место для логотипа и описания -->
+      <div class="container-lg">
+        <div class="row">
+          <div class="col-lg-3 mx-auto">
+            <img class="rounded-img" src="sunflower3.0.png" alt="AgroCV_Logo" />
+          </div>
+          <div class="col-lg-9 text-center">
+            <h1 class="fw-light"><b>AgroCV</b></h1>
+            <p class="lead text-muted">описание</p>
+          </div>
         </div>
       </div>
-    </div>
-    <br />
-    <!-- Выделяю стадию работы -->
-    <div class="container-lg text-center">
-      <p>
-        Загрузка -> <b><u>Обработка</u></b> -> Результат
-      </p>
-    </div>
-    <br />
-    <!-- Прогресс бар -->
-    <div class="loader mx-auto"></div>
-    <br />
-    <div class="container-lg text-center">
-      <p>Прогресс бар будет когда-нибудь, не факт, потом</p>
-      <p>А пока 1000/7</p>
+      <br />
+      <!-- Выделяю стадию работы -->
+      <div class="container-lg text-center" id="global-progress">
+        <p></p>
+        <p>Запрос 🡒 <span>Обработка</span> 🡒 Результат</p>
+      </div>
+      <br />
+      <!-- Прогресс бар -->
+      <div class="loader mx-auto"></div>
+      <br />
     </div>
   </body>
   <script src="script.js"></script>
+  <script>
+    // Получаем uuid из адресной строки и каждую секунду спрашиваем
+    // сервак как там запрос на обработку наш готов или как м?
+    const currentUrl = window.location.href;
+    const uuid = currentUrl.split("/").slice(-1);
+    setInterval(() => isProcessed(uuid[0]), 1000);
+  </script>
 </html>

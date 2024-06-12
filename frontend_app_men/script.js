@@ -41,7 +41,7 @@ dropFileZone.addEventListener("drop", function () {
   }
 });
 
-uploadInput.addEventListener("change", (event) => {
+/*uploadInput.addEventListener("change", (event) => {
   const file = uploadInput.files?.[0];
   if (file && file.type.startsWith("image/")) {
     processingUploadFile();
@@ -72,7 +72,7 @@ function processingUploadFile(file) {
       HTMLElement.style.display = "none";
     };
   }
-}
+}*/
 
 // Посылает GET запрос чтобы узнать четам по обработке
 async function isProcessed(id) {
@@ -84,17 +84,19 @@ async function isProcessed(id) {
     const res = await response.json();
     if (res.message == "failed") {
       window.location = "/failed_processing";
-    } else if (res.message == "ready") {
+    } 
+    else if (res.message == "ready") {
       window.location = `/results/${id}`;
+    }
+    else if (res.message == "not ready") {
+      let processed_files = res.processed_files;
+      let total_files = res.total_files;
+      let percent = Math.round((1.0 * processed_files / total_files) * 100);
+
+      document.getElementById("progress-text").textContent=`${percent}% (${processed_files} / ${total_files})`;
     }
   }
 }
-
-// Получаем uuid из адресной строки и каждую секунду спрашиваем
-// сервак как там запрос на обработку наш готов или как м?
-const currentUrl = window.location.href;
-const uuid = currentUrl.split("/").slice(-1);
-setInterval(() => isProcessed(uuid[0]), 1000);
 
 async function getResults(id) {
   // Этот GET запрос вернет пути к изображениям и оценку модели для каждого
@@ -107,6 +109,7 @@ async function getResults(id) {
   if (response.ok === true) {
     const req = await response.json();
     const rows = document.querySelector("tbody");
+    console.log(req);
     req.forEach((r) => rows.append(generateRow(r)));
   } else {
     console.log("response not ok");
@@ -116,19 +119,24 @@ async function getResults(id) {
 function generateRow(r) {
   // добавляем табличную строку
   const tr = document.createElement("tr");
+  r = '/res/' + r
+  console.log('abc ' + r);
 
   // пихаем в строку картинку и цифорку которую определила модель
-  const r_img = document.createElement("td");
+  const r_img = document.createElement("tr");
   let img = document.createElement("img");
-  img.src = r.data;
+  img.src = r;
+  img.height = 150;
   r_img.append(img);
 
-  const r_name = document.createElement("td");
-  r_name.append(r.label);
+  const r_download = document.createElement("tr");
+  const download_button = document.createElement("a");
+  download_button.href = r;
+  download_button.target = "_blank";
+  download_button.textContent = "Открыть";
+  r_download.append(download_button);
   tr.append(r_img);
-  tr.append(r_name);
+  tr.append(r_download);
 
   return tr;
 }
-
-getResults(uuid[0]);

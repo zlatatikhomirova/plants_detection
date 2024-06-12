@@ -14,22 +14,32 @@
     <title>AgroCV app</title>
   </head>
   <body>
-    <!-- В контейнере с помощью колонок разеделяю место для логотипа и описания -->
-    <div class="container-lg">
-      <div class="row">
-        <div class="col-lg-3 mx-auto">
-          <img class="rounded-img" src="sunflower2.0.png" alt="AgroCV_Logo" />
-        </div>
-        <div class="col-lg-9 text-center">
-          <h1 class="fw-light"><b>AgroCV</b></h1>
-          <p class="lead text-muted">описание</p>
+    <div class="hero">
+      <!-- В контейнере с помощью колонок разеделяю место для логотипа и описания -->
+      <div class="container-lg">
+        <div class="row">
+          <div class="col-lg-3 mx-auto">
+            <img class="rounded-img" src="sunflower3.0.png" alt="AgroCV_Logo" />
+          </div>
+          <div class="col-lg-9 text-center">
+            <h1 class="fw-light"><b>AgroCV</b></h1>
+            <p class="lead text-muted">описание</p>
+          </div>
         </div>
       </div>
-    </div>
-    <br />
-    <!-- Вывожу ошибку -->
-    <div class="container-lg text-center">
-      <img class="error-img" src="error.png" alt="Error_Request" />
+      <br />
+
+      <div class="container-lg text-center" id="global-progress">
+        <p></p>
+        <p>Запрос 🡒 <span>Обработка</span> 🡒 Результат</p>
+      </div>
+
+      <br />
+      <!-- Вывожу ошибку -->
+      <div class="container-lg text-center">
+        <p>Произошла ошибка.</p>
+        <a href="/">На главную</a>
+      </div>
     </div>
   </body>
   <script src="script.js"></script>

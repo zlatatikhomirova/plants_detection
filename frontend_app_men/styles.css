@@ -1,13 +1,17 @@
 /* Рамка для контейнеров и колонок */
 .container-lg,
 .col-lg-5 {
-  border: 5px solid black;
+  /*border: 5px solid black;*/
+  border-radius: 20px;
+  border: 2px solid #5a7954;
+  background: #edf0eb3f;
   padding: 0 10px;
 }
 /* Закругление изображения */
 .rounded-img {
   width: 100%;
   border-radius: 50%;
+  animation: spin 100s linear infinite;
 }
 /* Размер изображения об ошибке */
 .error-img {
@@ -18,13 +22,34 @@
   width: 80%;
 }
 /* Иконка загрузки */
-.loader {
-  border: 50px solid #f3f3f3;
-  border-top: 50px solid black;
+/*.loader {
+  border: 50px solid #a5dd9b;
+  border-top: 50px solid #5d7a58;
   border-radius: 50%;
   width: 350px;
   height: 350px;
   animation: spin 2s linear infinite;
+}*/
+
+@property --progress-value {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes progress {
+  to {
+    --progress-value: 97;
+  }
+}
+
+.loader {
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #cce798 79%, transparent 80% 100%),
+    conic-gradient(#5d7a58 calc(var(--progress-value) * 1%), #a5dd9b 0);
+  animation: progress 15s 1 forwards, spin 2s linear infinite;
 }
 
 /* Вращение иконки загрузки */
@@ -35,4 +60,60 @@
   100% {
     transform: rotate(360deg);
   }
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+}
+
+.hero {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(#a5dd9b, #f6f193);
+  /*display: flex;
+  align-items: center;
+  justify-content: center;*/
+}
+#drop-area {
+  width: 500px;
+  height: 300px;
+  padding: 30px;
+  background: #fff;
+  text-align: center;
+  border-radius: 20px;
+}
+
+#img-view {
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  border: 2px dashed #5d7a58;
+  background: #fbfff577;
+  padding: 0 100px;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+
+#img-view img {
+  width: 100px;
+  margin-top: 25px;
+}
+#img-view span {
+  display: block;
+  font-size: 12px;
+  color: #777;
+  margin-top: 15px;
+}
+
+#global-progress p {
+  font-size: 16px;
+  color: rgba(43, 43, 43, 0.61);
+}
+
+#global-progress span {
+  font-size: 16px;
+  color: rgb(0, 0, 0);
 }
