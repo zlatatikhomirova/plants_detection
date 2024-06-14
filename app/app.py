@@ -6,8 +6,11 @@ from PIL import Image
 import io
 import asyncio
 import random
+import os
+from zipfile import ZipFile
 
 import mnist_model.mnist_model_eval as MNISTModel
+import agrocv_model.agrocv_model_eval as AgroCVModel
 
 
 class ProcessingRequest:
@@ -58,7 +61,7 @@ async def process_files(uuid: str) -> None:
         
 
     # load model and get model's opinion on each image
-    MNISTModel.load_mnist_model()
+    #MNISTModel.load_mnist_model()
     outputs: list[int] = []
     files_counter = 0
     for file in req.imgs:
@@ -68,17 +71,21 @@ async def process_files(uuid: str) -> None:
         except Exception:
             req.failed = True
             return
-        output = MNISTModel.eval_mnist_on_file(img)
-        outputs.append(output)
+        img_path = f'uploaded_images/{uuid}_{files_counter}.jpg'
+        img.save(img_path)
+        img.close()
+        #output = MNISTModel.eval_mnist_on_file(img)
+        AgroCVModel.agrocv_model_eval(img_path)
+        #outputs.append(output)
 
         # also save photos in temporary location for neat results page
-        img.save(f'public/tempnumbers/{uuid}_{files_counter}.png')
-        req.pngs_paths.append(f'/getnumberpng/{uuid}_{files_counter}.png')
+        #img.save(f'public/tempnumbers/{uuid}_{files_counter}.png')
+        #req.pngs_paths.append(f'/getnumberpng/{uuid}_{files_counter}.png')
         files_counter += 1
-        img.close()
+        #img.close()
 
         req.processed_files += 1
-        await asyncio.sleep(random.random() * 1.25 + 0.25) # some useful work :)
+        #await asyncio.sleep(random.random() * 1.25 + 0.25) # some useful work :)
     
     #await asyncio.sleep(2) # some useful work :)
         
@@ -114,8 +121,21 @@ async def on_get_results(uuid: str):
     if req is None:
         return JSONResponse({}, status.HTTP_404_NOT_FOUND)
     response = []
-    for i in range(len(req.imgs)):
-        response.append({"data": req.pngs_paths[i], "label":req.results[i]})
+
+    directory = os.fsencode('public/results')
+    
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+        if filename.startswith(uuid) and filename.endswith(".jpg"): 
+            response.append('results/' + filename)
+            continue
+        else:
+            continue
+    
+    print(response)
+
+    #for i in range(len(req.imgs)):
+    #    response.append({"data": req.pngs_paths[i], "label":req.results[i]})
     return JSONResponse(response)
 
 @app.get("/isprocessed/{uuid}")
@@ -167,3 +187,22 @@ async def fail_gif():
 @app.get("/res/{resource}")
 async def get_resource(resource):
     return FileResponse(f"public/{resource}")
+
+@app.get("/res/results/{resource}")
+async def get_resource_results(resource):
+    return FileResponse(f"public/results/{resource}")
+
+@app.get("/download_archive/{uuid}")
+async def download_archive(uuid):
+    with ZipFile(f'public/results/{uuid}.zip', 'w') as zip_object:
+        directory = os.fsencode('public/results')
+    
+        for file in os.listdir(directory):
+            filename = os.fsdecode(file)
+            if filename.startswith(uuid) and filename.endswith(".jpg"): 
+                zip_object.write('public/results/' + filename, filename)
+                continue
+            else:
+                continue
+
+        return FileResponse(f'public/results/{uuid}.zip')

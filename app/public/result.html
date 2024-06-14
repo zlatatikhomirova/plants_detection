@@ -38,6 +38,7 @@
       <!-- Вывод результатов -->
       <div class="container">
         <h2>Результаты:</h2>
+        <a id="download_a" href="/">Скачать архивом</a>
         <table>
           <tbody></tbody>
         </table>
@@ -51,5 +52,8 @@
     const currentUrl = window.location.href;
     const uuid = currentUrl.split("/").slice(-1);
     getResults(uuid[0]);
+
+    const download_a = document.getElementById("download_a");
+    download_a.href = "/download_archive/" + uuid;
   </script>
 </html>

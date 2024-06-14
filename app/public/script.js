@@ -109,6 +109,7 @@ async function getResults(id) {
   if (response.ok === true) {
     const req = await response.json();
     const rows = document.querySelector("tbody");
+    console.log(req);
     req.forEach((r) => rows.append(generateRow(r)));
   } else {
     console.log("response not ok");
@@ -118,17 +119,24 @@ async function getResults(id) {
 function generateRow(r) {
   // добавляем табличную строку
   const tr = document.createElement("tr");
+  r = '/res/' + r
+  console.log('abc ' + r);
 
   // пихаем в строку картинку и цифорку которую определила модель
-  const r_img = document.createElement("td");
+  const r_img = document.createElement("tr");
   let img = document.createElement("img");
-  img.src = r.data;
+  img.src = r;
+  img.height = 150;
   r_img.append(img);
 
-  const r_name = document.createElement("td");
-  r_name.append(r.label);
+  const r_download = document.createElement("tr");
+  const download_button = document.createElement("a");
+  download_button.href = r;
+  download_button.target = "_blank";
+  download_button.textContent = "Открыть";
+  r_download.append(download_button);
   tr.append(r_img);
-  tr.append(r_name);
+  tr.append(r_download);
 
   return tr;
 }
