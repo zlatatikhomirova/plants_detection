@@ -71,47 +71,64 @@ def augment_data(samples, crop_coef=0.8):
                           VerticalFlip(p=1.0)))]
   return samples + augmented
 
-def make_logical_masks_and_bboxes(mask):
-  """
-  Поучить логические маски для поля.
-  """
-  if isinstance(mask, np.ndarray):
-    mask = torch.fromnumpy(mask)
-  # уникальные цвета масок
-  obj_ids = torch.unique(mask)
-  # первый из уникальных цветов - фон, удаляем это значение
-  obj_ids = obj_ids[1:]
-  # разделим маску с цветовой кодировкой на набор логических масок.
-  masks = mask == obj_ids[:, None, None]
-  return masks, masks_to_boxes(masks) 
+def img_to_bin_colors(img: np.ndarray):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.inRange(img, 200, 255) # 200 - выбрано экспериментально 
+    return img
 
-def draw_seg_masks(img, mask, logical_masks,
-                   alpha=0.8, colors='blue'):
-  """
-  Рисует маски растительности на изображении.
-  """
-  if isinstance(img, np.ndarray):
-    img = torch.fromnumpy(img)
-  if isinstance(mask, np.ndarray):
-    mask = torch.fromnumpy(mask)
-  drawn_masks = []
-  for mask in logical_masks:
-    drawn_masks.append(draw_segmentation_masks(img, mask, 
-                                               alpha=alpha, 
-                                               colors=colors))
-  show(drawn_masks, title='Segmentation masks on image')
+def computing_contours(mask: np.ndarray) -> tuple:
+    """
+        получение кортежа контуров по маске
+        
+        return 
+            typle(np.ndarray)
+    """
+    
+    if (not isinstance(mask, np.ndarray)):
+        mask = np.asarray(mask)
+        
+    if (mask.ndim != 2):
+        mask = img_to_bin_colors(mask)
+        
+    cnts = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[0]
+    
+    return cnts
 
-def draw_bboxes(img, bboxes_list, colors="red"):
-  """
-  Рисует bounding boxes на изображении.
-  """
-  if isinstance(img, np.ndarray):
-    img = torch.fromnumpy(img)
-  drawn_boxes = draw_bounding_boxes(img, 
-                                    bboxes_list,
-                                    colors=colors)
-  show(drawn_boxes, title='Bounding boxes on image')
-  
+def calc_sfs(img: np.array) -> int:
+    cnts = computing_contours(img)
+    return len(cnts[0])
+
+def draw_contours(result_img: np.ndarray | torch.Tensor, cnts: tuple ,threshold_value_plt:int = 20, color_border: int | tuple = (0, 0, 255)) -> torch.Tensor:
+    """_summary_
+        Насенение bb на копию result_img
+    Args:
+        result_img (np.ndarray) - изображение, на копию которого будут нанесены bb
+        threshold_value_plt- пороговое значение площади подсолнуха, который будет помещен в bb (все, что больше будут отмечены)
+
+     Returns:
+        torch.Tensor: изображение result_img с нанесенными bb
+        
+    """
+    
+    tmp_result_img = result_img.copy()
+    
+    # проверка типов
+    if (not isinstance(tmp_result_img, np.ndarray)):
+        tmp_result_img = np.asarray(tmp_result_img)
+    
+    # проверка количества каналов
+    if(tmp_result_img.ndim == 2):
+        color_border = 100
+        print("На вход подано двухканальное изображение. Цвет bb - серый.")
+
+    # отрисовка bb
+    for c in cnts:
+        x, y, w, h = cv2.boundingRect(c)
+        if ((x+w)*(y+h) > threshold_value_plt):
+            cv2.rectangle(tmp_result_img, (x, y), (x+w, y+h), color_border, 2)
+
+    return torch.from_numpy(tmp_result_img)
+
 def show(imgs, title=''):
   """
   Выводит изображения. Работа с изображениями, тип которых
