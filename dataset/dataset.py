@@ -1,32 +1,60 @@
-import numpy as np
-import cv2
 import torch
 from torch.utils.data import Dataset
-from utils import augment_data, norm_denoise
+from utils import load_image
+import os
+import torchvision.transforms.v2 as v2
+
+train_img_preprocessing = v2.Compose([
+  v2.ToImage(), 
+  v2.ToDtype(torch.float32, scale=True),
+  v2.RandomRotation(degrees=90),
+  v2.RandomResizedCrop(256, scale=(0.5, 1.0)),
+  v2.RandomVerticalFlip(p=0.5),
+  v2.RandomHorizontalFlip(p=0.5),
+  v2.Normalize(mean=[0.485, 0.456, 0.406],
+               std=[0.229, 0.224, 0.225])
+])
+
+base_img_preprocessing = v2.Compose([
+  v2.ToImage(), 
+  v2.ToDtype(torch.float32, scale=True),
+  v2.Normalize(mean=[0.485, 0.456, 0.406],
+               std=[0.229, 0.224, 0.225])
+])
+
+base_mask_preprocessing = v2.Compose([
+  v2.ToImage(), 
+  v2.ToDtype(torch.float32, scale=True),
+  v2.Grayscale(num_output_channels=1)
+])
 
 class PlantsDataset(Dataset):
 
-    def __init__(self, data,
-                need_preprocessing: bool = True):
-        
-        data = augment_data(data)
+  def __init__(self,
+               data: list,
+               imgs_dir: str,
+               masks_dir: str,
+               preprocessing: v2.Compose = base_img_preprocessing):
 
-        X = [sample.image for sample in data]
-        if need_preprocessing:
-          X = [norm_denoise(x) for x in X]
-        X = np.array(X)
-        y = np.array(
-                 [sample.mask for sample in data]
-                    )
-        
-        self.X = torch.from_numpy(X).float()
-        self.y = torch.from_numpy(y).float()
+    self.X_ids = []
+    self.y_ids = []
+    
+    for x, y in data:
+      path = os.path.join(imgs_dir, x)
+      self.X_ids += [path]
 
-    def __len__(self):
-        return self.X.shape[0]
+      path = os.path.join(masks_dir, y)
+      self.y_ids += [path]
+      
+    self.img_preprocessing = preprocessing
+    self.mask_preprocessing = base_mask_preprocessing
 
-    def __getitem__(self, index):
-      return (self.X[index], self.y[index])  
+  def __len__(self):
+    return self.X_ids.__len__()
 
-
-              
+  def __getitem__(self, index: int):
+    X = load_image(self.X_ids[index])
+    y = load_image(self.y_ids[index])
+    X = self.img_preprocessing(X)
+    y = self.mask_preprocessing(y)
+    return (X, y)
