@@ -72,9 +72,18 @@ def augment_data(samples, crop_coef=0.8):
   return samples + augmented
 
 def img_to_bin_colors(img: np.ndarray):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     img = cv2.inRange(img, 200, 255) # 200 - выбрано экспериментально 
     return img
+
+def is_valid_bb(bb: np.ndarray, threshold: int = 20) -> bool:
+    """
+        Проверяет является ли площадь bb допустимой (то что внутри bb не является шумом)
+    """
+    x, y, w, h = cv2.boundingRect(bb)
+    
+    return w*h > threshold
+
 
 def computing_contours(mask: np.ndarray) -> tuple:
     """
@@ -94,19 +103,23 @@ def computing_contours(mask: np.ndarray) -> tuple:
     
     return cnts
 
-def calc_sfs(img: np.array) -> int:
-    cnts = computing_contours(img)
-    return len(cnts[0])
+def calc_sfs(mask: np.array) -> int:
+    """
+    подсчет подсолнухов на маске
+    """
+    cnts = [cnt for cnt in computing_contours(mask) if (is_valid_bb(cnt))]
+    return len(cnts)
 
-def draw_contours(result_img: np.ndarray | torch.Tensor, cnts: tuple ,threshold_value_plt:int = 20, color_border: int | tuple = (0, 0, 255)) -> torch.Tensor:
+
+def draw_contours(result_img: np.ndarray, cnts: tuple ,threshold:int = 20, color_border: int | tuple = (0, 0, 255)) -> torch.Tensor:
     """_summary_
         Насенение bb на копию result_img
     Args:
         result_img (np.ndarray) - изображение, на копию которого будут нанесены bb
-        threshold_value_plt- пороговое значение площади подсолнуха, который будет помещен в bb (все, что больше будут отмечены)
+        threshold- пороговое значение площади bb, который будет отрисован, иначе будет закрашен (все, что больше будут отмечены)
 
      Returns:
-        torch.Tensor: изображение result_img с нанесенными bb
+        np.ndarray: изображение result_img с нанесенными bb
         
     """
     
@@ -121,13 +134,18 @@ def draw_contours(result_img: np.ndarray | torch.Tensor, cnts: tuple ,threshold_
         color_border = 100
         print("На вход подано двухканальное изображение. Цвет bb - серый.")
 
-    # отрисовка bb
-    for c in cnts:
-        x, y, w, h = cv2.boundingRect(c)
-        if ((x+w)*(y+h) > threshold_value_plt):
-            cv2.rectangle(tmp_result_img, (x, y), (x+w, y+h), color_border, 2)
-
+    # отрисовка bb 
+    for cnt in cnts:
+        x, y, w, h = cv2.boundingRect(cnt)
+        # если в bb попал реальный объект - обводим
+        if (is_valid_bb(cnt, threshold)):
+            cv2.rectangle(tmp_result_img, (x-bool(x), y-bool(y)), (x+w, y+h), color_border, 2)
+        # иначе закрашиваем bb чернымы
+        else:
+            cv2.rectangle(tmp_result_img, (x-bool(x), y-bool(y)), (x+w, y+h), 0, -1)
+            
     return torch.from_numpy(tmp_result_img)
+
 
 def show(imgs, title=''):
   """
