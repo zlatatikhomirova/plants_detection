@@ -173,3 +173,26 @@ def seed_everything(seed):
     torch.cuda.manual_seed(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
+
+def calcN(f: float, z: float): 
+    """
+    Функция расчета ширины и высоты фрагментов,
+    на которые будут разрезать фотографию
+    
+    :params:
+    f - float - фокусное расстояние камеры, с которой велась съемка
+    z - float - высота съемки
+
+    :returns:
+    N - int – ширина и высота фрагмента, на которые будут разрезать фотографию.
+    """
+
+    # Константные значения, принятые как базовые
+    f_30m = 0.01229 
+    z_30m = 30
+    n_30m = 256
+
+    # Рассчет по выведенной формуле
+    N = round((f / z) / (f_30m / z_30m) * n_30m)
+
+    return N
